@@ -1,0 +1,3 @@
+//= requireself
+//= require ./+(bar|baz).txt
+foo
