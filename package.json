@@ -1,6 +1,6 @@
 {
   "name": "cogs-transformer-directives",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Casey Foster <c@sey.me>",
   "description": "A directives transformer for Cogs.",
   "license": "MIT",
@@ -10,11 +10,11 @@
   },
   "dependencies": {
     "async": "0.9.0",
-    "glob": "4.3.5",
-    "underscore": "1.7.0"
+    "glob": "5.0.3",
+    "underscore": "1.8.2"
   },
   "devDependencies": {
-    "cogs-test-helper": "1.0.0"
+    "cogs-test-helper": "1.0.3"
   },
   "scripts": {
     "test": "cogs-test-helper test/test.js"
