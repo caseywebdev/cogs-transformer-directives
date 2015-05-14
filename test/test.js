@@ -23,6 +23,12 @@ helper.run({
       globs: [{
         path: 'test/+(bar|baz).txt',
         hash: helper.getGlobHash('test/+(bar|baz).txt')
+      }, {
+        path: 'test/foo.txt',
+        hash: helper.getGlobHash('test/foo.txt')
+      }, {
+        path: 'test/buz.txt',
+        hash: helper.getGlobHash('test/buz.txt')
       }]
     },
     'test/error.txt': Error,
