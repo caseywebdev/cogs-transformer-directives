@@ -56,7 +56,7 @@ var directiveGlob = function (pattern, file, type, cb) {
 };
 
 var DIRECTIVES = {
-  requireself: function (__, file, cb) { cb(null, {requires: [file.path]}); },
+  requireself: function (__, file, cb) { cb(null, {requires: file.requires}); },
   require: _.partial(directiveGlob, _, _, 'requires'),
   link: _.partial(directiveGlob, _, _, 'links')
 };
