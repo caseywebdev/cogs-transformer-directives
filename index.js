@@ -81,7 +81,7 @@ module.exports = function (file, options, cb) {
         return {
           requires: a.requires.concat(b.requires || []),
           links: a.links.concat(b.links || []),
-          globs: a.globs.concat(b.globs || []),
+          globs: a.globs.concat(b.globs || [])
         };
       }, {requires: [], links: [], globs: []});
       return cb(null, {

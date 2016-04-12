@@ -1,3 +1,3 @@
 //= link ./foo.txt
-//= link ./buz.txt
+//= link ./!(ba)z.txt
 bar

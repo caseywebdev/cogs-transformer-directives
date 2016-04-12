@@ -1,7 +1,1 @@
-{
-  "in": {
-    "txt": {
-      "transformers": "."
-    }
-  }
-}
+{"pipe": "."}

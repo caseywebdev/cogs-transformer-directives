@@ -27,7 +27,7 @@ helper.run({
         path: 'test/foo.txt',
         hash: helper.getGlobHash('test/foo.txt')
       }, {
-        path: 'test/buz.txt',
+        path: 'test/!(ba)z.txt',
         hash: helper.getGlobHash('test/buz.txt')
       }]
     },
