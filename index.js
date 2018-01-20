@@ -1,6 +1,8 @@
 const _ = require('underscore');
-const glob = require('glob');
+const {promisify} = require('util');
 const path = require('path');
+
+const glob = promisify(require('glob'));
 
 const HEADER = new RegExp(
   '^(' +
@@ -35,59 +37,48 @@ const extractDirectives = source => {
   };
 };
 
-const directiveGlob = (pattern, file, type) =>
-  new Promise((resolve, reject) => {
-    if (!pattern) {
-      throw new Error(`'${type.slice(0, -1)}' requires a glob pattern`);
-    }
+const directiveGlob = async (pattern, file, type) => {
+  if (!pattern) {
+    throw new Error(`'${type.slice(0, -1)}' requires a glob pattern`);
+  }
 
-    const base = pattern[0] === '.' ? path.dirname(file.path) : '';
-    pattern = path.relative('.', path.resolve(base, pattern));
-    glob(pattern, {nodir: true}, (er, paths) => {
-      if (er) return reject(er);
+  const base = pattern[0] === '.' ? path.dirname(file.path) : '';
+  pattern = path.relative('.', path.resolve(base, pattern));
+  const paths = await glob(pattern, {nodir: true});
 
-      if (!paths.length) {
-        return reject(new Error(`No files match '${pattern}'`));
-      }
+  if (!paths.length) throw (new Error(`No files match '${pattern}'`));
 
-      const obj = {globs: [pattern]};
-      obj[type] = paths;
-      resolve(obj);
-    });
-  });
+  return {[type]: paths, links: [pattern]};
+};
 
 const DIRECTIVES = {
-  requireself: (__, file) => Promise.resolve({requires: file.requires}),
+  requireself: async (__, file) => ({requires: file.requires}),
   require: _.partial(directiveGlob, _, _, 'requires'),
   link: _.partial(directiveGlob, _, _, 'links')
 };
 
-const getDependencies = (directive, file) =>
-  new Promise(resolve => {
-    const action = directive[0];
-    const fn = DIRECTIVES[action];
-    if (!fn) throw new Error(`Invalid directive: '${action}'`);
+const getDependencies = async (directive, file) => {
+  const action = directive[0];
+  const fn = DIRECTIVES[action];
+  if (!fn) throw new Error(`Invalid directive: '${action}'`);
 
-    resolve(fn(directive[1], file));
-  });
+  return fn(directive[1], file);
+};
 
-module.exports = ({file}) => {
-  const extracted = extractDirectives(file.buffer.toString());
-  return Promise.all(_.map(extracted.directives, directive =>
+module.exports = async ({file}) => {
+  const {directives, source} = extractDirectives(file.buffer.toString());
+  const dependencies = await Promise.all(_.map(directives, directive =>
     getDependencies(directive, file)
-  )).then(dependencies => {
-    dependencies = _.reduce(dependencies, function (a, b) {
-      return {
-        requires: a.requires.concat(b.requires || []),
-        links: a.links.concat(b.links || []),
-        globs: a.globs.concat(b.globs || [])
-      };
-    }, {requires: [], links: [], globs: []});
-    return {
-      buffer: new Buffer(extracted.source),
-      requires: dependencies.requires.concat(file.requires),
-      links: dependencies.links.concat(file.links),
-      globs: dependencies.globs.concat(file.globs)
-    };
-  });
+  ));
+
+  const {links, requires} = _.reduce(dependencies, (a, b) => ({
+    requires: a.requires.concat(b.requires || []),
+    links: a.links.concat(b.links || [])
+  }), {links: [], requires: []});
+
+  return {
+    buffer: new Buffer(source),
+    requires: requires.concat(file.requires),
+    links: links.concat(file.links)
+  };
 };
