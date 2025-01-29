@@ -1,10 +1,11 @@
 {
   "name": "cogs-transformer-directives",
   "type": "module",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "author": "Casey Foster <c@sey.me>",
   "description": "A directives transformer for Cogs.",
   "license": "MIT",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/caseywebdev/cogs-transformer-directives"
